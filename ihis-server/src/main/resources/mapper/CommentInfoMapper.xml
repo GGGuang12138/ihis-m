@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gg.server.mapper.edu.CommentInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.gg.server.entity.edu.CommentInfo">
+        <id column="id" property="id" />
+        <result column="zid" property="zid" />
+        <result column="uid" property="uid" />
+        <result column="cid" property="cid" />
+        <result column="commentType" property="commentType"/>
+        <result column="commentStatus" property="commentStatus"/>
+        <result column="content" property="content" />
+        <result column="createTime" property="createTime" />
+        <result column="updateTime" property="updateTime" />
+        <result column="commentCount" property="commentCount" />
+        <result column="likeCount" property="likeCount" />
+    </resultMap>
+
+    <resultMap id="CommentWithUser" type="com.gg.server.entity.edu.CommentInfo" extends="BaseResultMap">
+        <association property="user" javaType="com.gg.server.entity.User">
+            <id column="uid" property="id"/>
+            <result column="uName" property="name" />
+            <result column="uUrl" property="userFace" />
+        </association>
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, zip, uid,cid, content, createTime, updateTime, commentCount, likeCount, commentType, commentStatus
+    </sql>
+
+    <select id="getCommentByPage" resultMap="CommentWithUser">
+        SELECT
+            a.id as id,
+            a.uid as uid,
+            a.content as content,
+            a.createTime as createTime,
+            a.commentCount as commentCount,
+            a.likeCount as likeCount,
+            a.commentType as commentType,
+            a.commentStatus as commentStatus,
+            a.zid as zid,
+            m.name as uName,
+            m.userFace as uUrl
+        FROM
+            edu_comment_info a,
+            m_user m
+        WHERE
+            a.uid = m.id
+        <if test="null!=id">
+            AND
+            a.zid = #{id}
+        </if>
+        <if test="null!=type">
+            AND
+            a.commentType = #{type}
+        </if>
+        <if test="null!=type">
+            AND
+            a.commentStatus = 1
+        </if>
+    </select>
+
+</mapper>

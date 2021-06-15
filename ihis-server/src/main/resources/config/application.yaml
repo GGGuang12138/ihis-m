@@ -1,0 +1,69 @@
+server:
+  port: 8083
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/ihis_d?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 12345678
+    hikari:
+      pool-name: DataHikariCP
+      minimum-idle: 5
+#      最大连接数，默认为10
+      maximum-pool-size: 10
+#      空闲连接存活时间：3分钟，默认600000毫秒（10分钟）
+      idle-timeout: 180000
+#      连接最大存活时间：30分钟，默认也是30分钟
+      max-lifetime: 1800000
+#      连接超时时间：30秒，默认也是30秒
+      connection-timeout: 30000
+#      连接是否自动提交
+      auto-commit: true
+#      测试连接是否可用的查询语句
+      connection-test-query: SELECT 1
+  redis:
+    password: 12345678
+    timeout: 10000ms
+    host: localhost
+    port: 6379
+    database: 0
+    lettuce:
+      pool:
+        max-active: 1024
+        max-wait: 10000ms
+        max-idle: 200
+        min-idle: 5
+mybatis-plus:
+#  配置文件所在位置
+  mapper-locations:  classpath*:/mapper/*Mapper.xml
+#  mybatis数据返回类型别名
+  type-aliases-package: com.gg.server.entity
+#  下划线自动变驼峰命名
+  configuration:
+    map-underscore-to-camel-case: false
+# 枚举
+  type-enums-package: com.gg.server.pojo.enums
+logging:
+  level:
+    com.gg.server.mapper: debug
+
+jwt:
+  # JWT存储的请求头
+  tokenHeader: Authorization
+  # 加密密钥
+  secret: ggnb
+  # 过期时间，24小时（60*60*24）
+  expiration: 604800
+  # 负载中拿到的开头
+  tokenHead: Bearer
+
+file-service:
+  # classId-vod
+  classId-vod: ac8d941c3803d0771908bdfcd874b58f
+  # classId-img
+  classId-img: e695bdb48b01db04fd20b95f3e61f092
+  # partnerId
+  partnerId: c9062ae380fbcf83eb9e9c20091aa204
+  # partnerKey
+  partnerKey: 2ce3d00bb802819a78cb84875695ff8f
+

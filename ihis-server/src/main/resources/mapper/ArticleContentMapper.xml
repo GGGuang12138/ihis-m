@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gg.server.mapper.edu.ArticleContentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.gg.server.entity.edu.ArticleContent">
+        <id column="id" property="id" />
+        <result column="cid" property="cid" />
+        <result column="creatorId" property="creatorId" />
+        <result column="creatorName" property="creatorName" />
+        <result column="creatorTime" property="creatorTime" />
+        <result column="title" property="title" />
+        <result column="coverCount" property="coverCount" />
+        <result column="coverUrl" property="coverUrl" />
+        <result column="articleState" property="articleState" />
+        <result column="contentSummary" property="contentSummary" />
+        <result column="contentId" property="contentId" />
+        <result column="updateTime" property="updateTime" />
+        <result column="articleType" property="articleType"/>
+        <result column="contentUrl" property="contentUrl"/>
+    </resultMap>
+
+    <resultMap id="ArticleSimpleInfo" type="com.gg.server.entity.edu.ArticleContent" extends="BaseResultMap">
+        <association property="channel" javaType="com.gg.server.entity.edu.Channel">
+            <id column="cid" property="id"/>
+            <result column="cname" property="name" />
+        </association>
+    </resultMap>
+
+    <resultMap id="ArticleDoctorInfo" type="com.gg.server.entity.edu.ArticleContent" extends="BaseResultMap">
+        <association property="doctorBase" javaType="com.gg.server.entity.edu.DoctorBase">
+            <id column="bid" property="id"/>
+            <result column="b_hspName" property="hspName" />
+            <result column="b_deptName" property="deptName" />
+            <result column="b_coverUrl" property="coverUrl" />
+        </association>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, cid, creatorId, creatorName, creatorTime, title, coverCount, coverUrl, articleState, contentSummary, contentId, updateTime, articleType
+    </sql>
+
+    <select id="getArticleByPage" resultMap="ArticleSimpleInfo">
+        SELECT
+            a.id as id,
+            a.creatorName as creatorName,
+            a.creatorTime as creatorTime,
+            a.articleState as articleState,
+            a.updateTime as updateTime,
+            a.contentId as contentId,
+            a.coverUrl as coverUrl,
+            a.title as title,
+            c.name as cname
+        FROM
+            edu_article_content a,
+            edu_channel c
+        WHERE
+            a.cid = c.id
+            <if test="null!=articleContent.title and ''!=articleContent.title">
+              AND
+              a.title LIKE CONCAT('%',#{articleContent.title},'%')
+            </if>
+            <if test="null!=articleContent.creatorName and ''!=articleContent.creatorName">
+                AND
+                a.creatorName LIKE CONCAT('%',#{articleContent.creatorName},'%')
+            </if>
+            <if test="null!=articleContent.cid">
+                AND
+                a.cid = #{articleContent.cid}
+            </if>
+            <if test="null!=articleContent.articleState">
+                AND
+                a.articleState = #{articleContent.articleState}
+            </if>
+
+            <if test="null!=createDateScope and 2 == createDateScope.length">
+            AND a.creatorTime BETWEEN #{createDateScope[0]} AND #{createDateScope[1]}
+            </if>
+        ORDER BY creatorTime DESC
+    </select>
+
+    <select id="getArticleByCid" resultMap="ArticleSimpleInfo">
+        SELECT
+        a.id as id,
+        a.creatorName as creatorName,
+        a.creatorTime as creatorTime,
+        a.articleState as articleState,
+        a.updateTime as updateTime,
+        a.contentId as contentId,
+        a.coverCount as coverCount,
+        a.coverUrl as coverUrl,
+        a.title as title,
+        c.name as cname,
+        a.articleType as articleType
+        FROM
+        edu_article_content a,
+        edu_channel c
+        WHERE
+        a.cid = c.id
+        <if test="null!=channelId">
+            AND
+            a.cid = #{channelId}
+        </if>
+        ORDER BY creatorTime DESC
+
+    </select>
+
+    <select id="getArticleDoctor" resultMap="ArticleDoctorInfo">
+        SELECT
+        a.id as id,
+        a.creatorName as creatorName,
+        a.creatorId as creatorId,
+        b.id as bid,
+        b.hspName as b_hspName,
+        b.deptName as b_deptName,
+        b.coverUrl as b_coverUrl,
+        a.creatorTime as creatorTime,
+        a.updateTime as updateTime,
+        a.contentId as contentId,
+        a.contentSummary as contentSummary,
+        a.coverCount as coverCount,
+        a.coverUrl as coverUrl,
+        a.title as title,
+        a.articleType as articleType,
+        a.contentUrl as contentUrl
+        FROM
+        edu_article_content a,
+        edu_doctor_base b
+        WHERE
+        a.creatorId = b.id
+        <if test="null!=id">
+            AND
+            a.id = #{id}
+        </if>
+    </select>
+
+    <select id="getArticleByq" resultMap="ArticleSimpleInfo">
+        SELECT
+        a.id as id,
+        a.title as title
+        FROM
+        edu_article_content a
+        WHERE
+        1=1
+        <if test="null!=q">
+            AND
+            a.title LIKE CONCAT('%',#{q},'%')
+        </if>
+        ORDER BY a.creatorTime DESC
+    </select>
+</mapper>
